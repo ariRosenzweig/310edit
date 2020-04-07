@@ -59,37 +59,15 @@ class Proj:
           def extractLinks (self):  
               self.b = []                                                             
               c = []  
-              dicte = {} 
-              json_data = self.response.json()  
-              for n in range(len(json_data['Entries'])):  
-                  Ur2 = json_data['Entries'][n]['obitlink'] 
-                  Ur3 = json_data['Entries'][n]['name']  
-                  c.append(Ur2)  
-                  dicte.update({str(Ur2): Ur3}) 
-              for uri in c:        
-                     
-                if uri.split(".aspx")[1].split("=")[0] == '?n':  
-                   ur = uri.split("?n=")[1].replace("&pid", "-obituary?pid") 
-                   ur3 = "https://www.legacy.com/obituaries/name/"  
-                   uri = ur3 + ur 
-                   self.b.append(uri) 
-                elif uri.split('/')[3].split('=')[0] == 'link.asp?i': 
-                    name = dicte[str(uri)]  
-                    id = uri.split('/')[3].split('000')[1] 
-                    uri="https://www.legacy.com/obituaries/name/" + name + "-obituary?pid=" + id 
-                     
-                    self.b.append(uri)  
-                else:  
-                    if uri.split('/')[4] == 'name': 
-                        self.b.append(uri)                                                                                                                   
-              def match(i):  
-                     j = i  
-                     for el in i:  
-                        for le in j:  
-                            if  (el.split("=")[1][0:3] in le or el.split("name/")[1].split("?")[0] in le ) and i.index(el) != j.index(le) :  
-                                j.remove(le)  
-                     i = j           
-              match(self.b)                  
+              json_data = self.response.json()
+              c = json_data   
+              for n in range(int(str(c).count("'id':"))): 
+                  Id = c['Entries'][n]['id']  
+                  name = c['Entries'][n]['name'].replace(' ', '-').replace('.', '') + '-obituary?pid='
+                  string="https://www.legacy.com/obituaries/name/"
+                  if c['Entries'][n]['name'] != '':
+                      self.b.append(f'{string}{name}{Id}')    
+              
           def getLinks (self):  
               m=1  
               d = []  
@@ -106,6 +84,22 @@ class Proj:
                      d = d + self.b  
                      m += 1  
               self.b = d                                                                                                                                     
+             #print(print(self.b))
+          def getPage(self, pageno=None):
+                g = []
+                page = self.apiurl
+                self.apiurl = "{}&Page={}".format(page, pageno)
+                self.getApi() 
+                self.extractLinks()
+                g = g + self.b
+                self.b = g
+               #print(self.b)
+                                                                                                                                                        
+
+
+
+
+
 
           def extractText (self):  
               e = []  
